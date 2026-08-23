@@ -14,10 +14,10 @@ const PHONE_DISPLAY = "9194044482";
 const PHONE_TEL = "+919194044482";
 const WHATSAPP = `https://wa.me/919194044482?text=${encodeURIComponent("Namaste NEW JAISAVAAL PACKERS AYODHYA - shifting ke liye quote chahiye. GSTIN 09AVRPJ3630K1Z5")}`;
 const GSTIN = "09AVRPJ3630K1Z5";
-const ADDRESS = "Shop No. 14, Near Ayodhya Dham Railway Crossing, Faizabad Road, Ayodhya, UP - 224001";
-const SHORT_ADDR = "Faizabad Road, Ayodhya Dham";
-const GMAP_EMBED = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3557.5!2d82.1895!3d26.7956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399a07937e6d2823%3A0x5fc0c1f2e5b3b3a1!2sAyodhya%20Faizabad%20Road!5e0!3m2!1sen!2sin!4v1690000000000!5m2!1sen!2sin";
-const GMAP_LINK = "https://maps.google.com/?q=NEW+JAISAVAAL+PACKERS+AYODHYA+Faizabad+Road+Near+Railway+Crossing";
+const ADDRESS = "Shop No. 284, T.P. Nagar Gate No. 1, RTO Office, Ayodhya U.P. 224001";
+const SHORT_ADDR = "T.P. Nagar Gate No. 1, RTO Office, Ayodhya";
+const GMAP_EMBED = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3557.5!2d82.1895!3d26.7956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399a07937e6d2823%3A0x5fc0c1f2e5b3b3a1!2sAyodhya%20T.P.%20Nagar%20RTO%20Office!5e0!3m2!1sen!2sin!4v1690000000000!5m2!1sen!2sin";
+const GMAP_LINK = "https://maps.google.com/?q=NEW+JAISAVAAL+PACKERS+AYODHYA+Shop+No.+284+T.P.+Nagar+Gate+No.+1+RTO+Office";
 
 const keyServices = [
   { label: "Household Shifting", Icon: Home },
@@ -120,7 +120,7 @@ export default function App() {
             <div className="leading-none">
               <div className="font-black text-[14px] md:text-[16.5px] tracking-tight flex flex-wrap gap-1" style={{fontFamily:'Fraunces'}}><span className="text-[#0F1220]">NEW JAISAVAAL</span><span className="text-[#FF6B00]">PACKERS & MOVERS</span></div>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-bold tracking-[0.18em] text-[#7A7A85]">AYODHYA • {GSTIN.slice(-4)}</span>
+                <span className="text-[10px] font-bold tracking-[0.18em] text-[#7A7A85]">GSTIN: {GSTIN}</span>
                 <span className="w-1 h-1 bg-[#FF6B00] rounded-full"/>
                 <span className="text-[11px] font-extrabold text-[#0F1220] flex items-center gap-0.5"><Star size={10} className="fill-[#FF6B00] text-[#FF6B00]"/> 4.8 • 847 Reviews</span>
               </div>
@@ -236,7 +236,7 @@ export default function App() {
         <div className="mx-auto max-w-[1280px] px-4 md:px-6">
           <div className="flex flex-wrap items-end justify-between gap-5 mb-8">
             <div>
-              <div className="inline-flex items-center gap-2 bg-[#0F1220] text-white rounded-full px-3.5 py-1.5 text-[11px] font-black tracking-widest"><Box size={12}/> REAL TRANSPORT FLEET • GSTIN {GSTIN.slice(-4)}</div>
+              <div className="inline-flex items-center gap-2 bg-[#0F1220] text-white rounded-full px-3.5 py-1.5 text-[11px] font-black tracking-widest"><Box size={12}/> REAL TRANSPORT FLEET • GSTIN {GSTIN}</div>
               <h2 className="mt-4 font-black text-[28px] md:text-[44px] leading-[0.92] tracking-tight" style={{fontFamily:'Fraunces'}}><span className="text-[#0F1220]">Our Fleet in Ayodhya</span><br/><span className="text-[#FF6B00]">Real Action Photos</span></h2>
               <p className="mt-2 text-[13.5px] leading-[1.6] text-[#5B5B6B] max-w-[520px]">Transport images for real visions — actual trucks, packing, loading, warehouse at our Ayodhya yard.</p>
             </div>
@@ -287,7 +287,7 @@ export default function App() {
             <h2 className="mt-5 font-black text-[30px] md:text-[42px] leading-[0.9]" style={{fontFamily:'Fraunces'}}>We know every gali of <span className="text-[#FFD23F]">Ram Nagari</span></h2>
             <p className="mt-4 text-white/70 text-[14px] leading-relaxed">Aggregators charge 30% commission and send unknown labour. We are pure local — owner picks directly. No IVR.</p>
             <div className="mt-8 grid sm:grid-cols-2 gap-4">
-              <div className="bg-white/5 border border-white/10 rounded-[16px] p-4"><div className="font-bold text-[13px] text-[#FFD23F]">Real Verified Shop</div><div className="text-[12.5px] text-white/70 mt-1.5 leading-[1.5]">Visit shop at Faizabad Road. GSTIN displayed. Google pin verified.</div></div>
+              <div className="bg-white/5 border border-white/10 rounded-[16px] p-4"><div className="font-bold text-[13px] text-[#FFD23F]">Real Verified Shop</div><div className="text-[12.5px] text-white/70 mt-1.5 leading-[1.5]">Visit shop at {SHORT_ADDR}. GSTIN displayed. Google pin verified.</div></div>
               <div className="bg-white/5 border border-white/10 rounded-[16px] p-4"><div className="font-bold text-[13px] text-[#FFD23F]">Ayodhya Team Only</div><div className="text-[12.5px] text-white/70 mt-1.5 leading-[1.5]">11 staff from Ayodhya, Faizabad, Bhadarsa — ID verified.</div></div>
               <div className="bg-white/5 border border-white/10 rounded-[16px] p-4"><div className="font-bold text-[13px] text-[#FFD23F]">Safe Handling 2L Cover</div><div className="text-[12.5px] text-white/70 mt-1.5 leading-[1.5]">Export packing, blanket wrap, insurance paper.</div></div>
               <div className="bg-white/5 border border-white/10 rounded-[16px] p-4"><div className="font-bold text-[13px] text-[#FFD23F]">Easy Booking Direct</div><div className="text-[12.5px] text-white/70 mt-1.5 leading-[1.5]">WhatsApp video survey, written quote, pay after satisfaction.</div></div>
@@ -348,16 +348,16 @@ export default function App() {
             </form>
           </div>
           <div className="order-1 lg:order-2 space-y-5">
-            <div className="inline-flex items-center gap-2 bg-[#0F1220] text-white rounded-full px-3.5 py-1.5 text-[11px] font-black tracking-widest"><MapPin size={12} className="text-[#FFD23F]"/> REAL LOCATION • GSTIN {GSTIN.slice(-4)}</div>
+            <div className="inline-flex items-center gap-2 bg-[#0F1220] text-white rounded-full px-3.5 py-1.5 text-[11px] font-black tracking-widest"><MapPin size={12} className="text-[#FFD23F]"/> REAL LOCATION • GSTIN {GSTIN}</div>
             <h2 className="font-black text-[28px] md:text-[40px] leading-[0.9] text-[#0F1220]" style={{fontFamily:'Fraunces'}}>Visit real shop —<br/><span className="text-[#FF6B00]">Not virtual address</span></h2>
-            <p className="text-[13.5px] leading-[1.6] text-[#5B5B6B] max-w-[520px]">Many packers show fake Ayodhya addresses. Our shop is on Faizabad Road crossing with GSTIN board displayed.</p>
+            <p className="text-[13.5px] leading-[1.6] text-[#5B5B6B] max-w-[520px]">Many packers show fake Ayodhya addresses. Our GSTIN-verified shop is at {SHORT_ADDR}, as shown on our board.</p>
             <div className="rounded-[24px] overflow-hidden border border-[#E9E0D1] shadow-sm bg-white">
               <div className="aspect-[16/10] md:aspect-[16/9] relative bg-[#E9E0D1]">
                 <iframe title={`NEW JAISAVAAL PACKERS AYODHYA ${GSTIN}`} src={GMAP_EMBED} className="absolute inset-0 w-full h-full border-0" loading="lazy" referrerPolicy="no-referrer-when-downgrade"/>
                 <div className="absolute bottom-3 left-3 bg-white rounded-[12px] px-3 py-2 shadow flex items-center gap-2 text-[11px] font-bold"><span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"/> LIVE PIN • AYODHYA DHAM</div>
               </div>
               <div className="p-5 flex flex-col gap-3">
-                <div className="flex gap-3"><div className="w-9 h-9 rounded-full bg-[#0F1220] flex items-center justify-center text-white shrink-0"><MapPin size={16}/></div><div><div className="font-black text-[13px] text-[#0F1220]">NEW JAISAVAAL PACKERS & MOVERS AYODHYA</div><div className="text-[12px] text-[#5B5B6B] leading-snug mt-0.5">{ADDRESS}<br/>Landmark: Railway Crossing, Opp. Hanuman Mandir, 200m from Bus Stand<br/>GSTIN: <b>{GSTIN}</b> • Ph: {PHONE_DISPLAY}</div></div></div>
+                <div className="flex gap-3"><div className="w-9 h-9 rounded-full bg-[#0F1220] flex items-center justify-center text-white shrink-0"><MapPin size={16}/></div><div><div className="font-black text-[13px] text-[#0F1220]">NEW JAISAVAAL PACKERS & MOVERS AYODHYA</div><div className="text-[12px] text-[#5B5B6B] leading-snug mt-0.5">{ADDRESS}<br/>Landmark: T.P. Nagar Gate No. 1, RTO Office<br/>GSTIN: <b>{GSTIN}</b> • Ph: {PHONE_DISPLAY}</div></div></div>
                 <div className="grid grid-cols-3 gap-2 pt-1">
                   <a href={`tel:${PHONE_TEL}`} className="h-10 rounded-full bg-[#0F1220] text-white flex items-center justify-center gap-1 text-[11px] font-bold"><PhoneCall size={12}/> Call Now</a>
                   <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="h-10 rounded-full bg-[#25D366] text-white flex items-center justify-center gap-1 text-[11px] font-bold"><MessageCircle size={12}/> WhatsApp Now</a>
