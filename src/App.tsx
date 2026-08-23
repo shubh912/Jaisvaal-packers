@@ -113,17 +113,11 @@ export default function App() {
       {/* Header - NO phone call button, only Get Quote + WhatsApp */}
       <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#FFFCF5]/90 border-b border-[#E9E0D1]">
         <div className="mx-auto max-w-[1280px] px-4 md:px-6 h-[64px] md:h-[76px] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 md:w-[48px] md:h-[48px] rounded-[14px] bg-[#0F1220] flex items-center justify-center shadow-[0_8px_24px_-8px_rgba(15,18,32,0.45)]">
-              <div className="text-center leading-none"><div className="text-[#FFD23F] font-black text-[10px] tracking-[0.18em]" style={{fontFamily:'Fraunces'}}>NJ</div><div className="text-white font-extrabold text-[11px] -mt-0.5 tracking-wider">PM</div></div>
-            </div>
-            <div className="leading-none">
-              <div className="font-black text-[14px] md:text-[16.5px] tracking-tight flex flex-wrap gap-1" style={{fontFamily:'Fraunces'}}><span className="text-[#0F1220]">NEW JAISAVAAL</span><span className="text-[#FF6B00]">PACKERS & MOVERS</span></div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-bold tracking-[0.18em] text-[#7A7A85]">GSTIN: {GSTIN}</span>
-                <span className="w-1 h-1 bg-[#FF6B00] rounded-full"/>
-                <span className="text-[11px] font-extrabold text-[#0F1220] flex items-center gap-0.5"><Star size={10} className="fill-[#FF6B00] text-[#FF6B00]"/> 4.8 • 847 Reviews</span>
-              </div>
+          <div className="flex items-center gap-3 min-w-0">
+            <img src="/logo.svg" alt="NEW JAISAVAAL PACKERS & MOVERS AYODHYA" className="w-[210px] md:w-[270px] h-auto max-h-[52px]" />
+            <div className="hidden sm:flex items-center gap-2 shrink-0">
+              <span className="w-1 h-1 bg-[#FF6B00] rounded-full"/>
+              <span className="text-[11px] font-extrabold text-[#0F1220] flex items-center gap-0.5"><Star size={10} className="fill-[#FF6B00] text-[#FF6B00]"/> 4.8 • 847 Reviews</span>
             </div>
           </div>
           <nav className="hidden lg:flex items-center gap-7 text-[13px] font-semibold text-[#3B3B46]">
