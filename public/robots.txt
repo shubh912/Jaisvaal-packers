@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://jaisvaalmovers.vercel.app/sitemap.xml
