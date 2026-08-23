@@ -171,9 +171,9 @@ export default function App() {
                 <span className="text-[#0F1220]">AYODHYA&apos;S REAL LOCAL SHOP • EST. 2012 • IBA APPROVED</span>
                 <span className="hidden sm:inline-flex bg-[#0F1220] text-white px-2.5 py-0.5 rounded-full text-[10px] tracking-widest">GSTIN: {GSTIN}</span>
               </div>
-              <h1 className="mt-6 md:mt-8 font-black leading-[0.84] tracking-tighter" style={{fontFamily:'Fraunces'}}>
+              <h1 className="mt-6 md:mt-8 font-black leading-[1.05] tracking-tighter" style={{fontFamily:'Fraunces'}}>
                 <span className="block text-[40px] sm:text-[52px] md:text-[68px] text-[#0F1220]">NEW JAISAVAAL</span>
-                <span className="block text-[40px] sm:text-[52px] md:text-[68px] text-[#FF6B00] -mt-1.5">PACKERS & MOVERS</span>
+                <span className="block mt-1 text-[40px] sm:text-[52px] md:text-[68px] text-[#FF6B00]">PACKERS & MOVERS</span>
                 <span className="block text-[20px] sm:text-[24px] md:text-[30px] text-[#0F1220]/70 tracking-wide mt-2 font-bold">AYODHYA</span>
               </h1>
               <h2 className="mt-4 text-[18px] md:text-[24px] font-extrabold text-[#0F1220] flex items-center gap-3 justify-center" style={{fontFamily:'Fraunces'}}>
