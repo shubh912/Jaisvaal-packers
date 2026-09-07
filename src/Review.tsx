@@ -202,7 +202,7 @@ export default function Review() {
 
           <p style={styles.subtitle}>
             Tell us about your actual experience with{" "}
-            <strong>Saket Packers & Movers</strong>.
+            <strong>Jaisavaal Packers & Movers</strong>.
           </p>
         </div>
 
