@@ -430,7 +430,7 @@ export default function Review() {
         )}
 
         <div style={styles.footer}>
-          <strong>Saket Packers & Movers</strong>
+          <strong>Jaisavaal Packers & Movers</strong>
           <span>
             Your genuine experience helps others make
             better decisions.
