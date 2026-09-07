@@ -1,3 +1,5 @@
+// src/Review.tsx
+
 import React, { useState } from "react";
 import {
   generateReview,
@@ -5,43 +7,7 @@ import {
 } from "../lib/reviewGenerator";
 
 const GOOGLE_REVIEW_URL =
-  "https://maps.app.goo.gl/Bcj1gqt2r6TR7Htq5";
-
-const cities = [
-  "Ayodhya",
-  "Faizabad",
-  "Lucknow",
-  "Varanasi",
-  "Prayagraj",
-  "Gorakhpur",
-  "Kanpur",
-  "Delhi",
-  "New Delhi",
-  "Noida",
-  "Greater Noida",
-  "Ghaziabad",
-  "Agra",
-  "Meerut",
-  "Bareilly",
-  "Aligarh",
-  "Moradabad",
-  "Mathura",
-  "Vrindavan",
-  "Jaipur",
-  "Chandigarh",
-  "Gurugram",
-  "Faridabad",
-  "Dehradun",
-  "Haridwar",
-  "Amritsar",
-  "Ludhiana",
-  "Patiala",
-  "Kota",
-  "Bhopal",
-  "Indore",
-  "Prayagraj",
-  "Raipur",
-];
+  "https://share.google/fBdd3U8mb7QdD9PbE";
 
 const services = [
   "House Shifting",
@@ -63,146 +29,100 @@ const experienceOptions = [
   "Value for money",
 ];
 
-const ratingLabels: Record<Rating, string> = {
-  1: "Poor",
-  2: "Needs improvement",
-  3: "Good",
-  4: "Very good",
-  5: "Excellent",
-};
-
-async function copyToClipboard(text: string): Promise<boolean> {
-  try {
-    if (
-      navigator.clipboard &&
-      window.isSecureContext
-    ) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-
-    const textarea = document.createElement("textarea");
-
-    textarea.value = text;
-    textarea.style.position = "fixed";
-    textarea.style.left = "-9999px";
-    textarea.style.top = "0";
-
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-
-    const copied = document.execCommand("copy");
-
-    document.body.removeChild(textarea);
-
-    return copied;
-  } catch {
-    return false;
-  }
-}
-
 export default function Review() {
   const [rating, setRating] = useState<Rating>(5);
-  const [fromCity, setFromCity] = useState("Ayodhya");
-  const [toCity, setToCity] = useState("Lucknow");
   const [service, setService] = useState("House Shifting");
   const [experiences, setExperiences] = useState<string[]>([]);
-  const [review, setReview] = useState("");
+  const [generatedReview, setGeneratedReview] = useState("");
   const [copied, setCopied] = useState(false);
-  const [generating, setGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const toggleExperience = (experience: string) => {
-    setExperiences((current) => {
-      if (current.includes(experience)) {
-        return current.filter(
-          (item) => item !== experience
-        );
-      }
+    setExperiences((current) =>
+      current.includes(experience)
+        ? current.filter((item) => item !== experience)
+        : [...current, experience]
+    );
+  };
 
-      return [...current, experience];
-    });
+  const copyReview = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      try {
+        const textarea = document.createElement("textarea");
+
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        textarea.style.top = "0";
+
+        document.body.appendChild(textarea);
+
+        textarea.focus();
+        textarea.select();
+
+        const successful =
+          document.execCommand("copy");
+
+        document.body.removeChild(textarea);
+
+        return successful;
+      } catch {
+        return false;
+      }
+    }
   };
 
   const handleGenerate = async () => {
-    setGenerating(true);
+    if (isGenerating) return;
+
+    setIsGenerating(true);
     setCopied(false);
 
-    const generated = generateReview({
-      rating,
-      fromCity,
-      toCity,
-      service,
-      experiences,
-    });
+    try {
+      const review = generateReview({
+        rating,
+        service,
+        experiences,
+      });
 
-    setReview(generated);
+      setGeneratedReview(review);
 
-    const copiedSuccessfully =
-      await copyToClipboard(generated);
+      const wasCopied = await copyReview(review);
 
-    setCopied(copiedSuccessfully);
-    setGenerating(false);
-  };
+      setCopied(wasCopied);
 
-  const handleCopy = async () => {
-    if (!review) return;
-
-    const copiedSuccessfully =
-      await copyToClipboard(review);
-
-    setCopied(copiedSuccessfully);
-  };
-
-  const handleOpenGoogle = () => {
-    window.open(
-      GOOGLE_REVIEW_URL,
-      "_blank",
-      "noopener,noreferrer"
-    );
-  };
-
-  const handleGenerateAndOpen = async () => {
-    setGenerating(true);
-    setCopied(false);
-
-    const generated = generateReview({
-      rating,
-      fromCity,
-      toCity,
-      service,
-      experiences,
-    });
-
-    setReview(generated);
-
-    await copyToClipboard(generated);
-
-    setCopied(true);
-    setGenerating(false);
-
-    window.open(
-      GOOGLE_REVIEW_URL,
-      "_blank",
-      "noopener,noreferrer"
-    );
+      /*
+       * Small delay gives the browser time to complete
+       * the clipboard operation before navigating away.
+       */
+      setTimeout(() => {
+        window.location.href = GOOGLE_REVIEW_URL;
+      }, 250);
+    } finally {
+      setTimeout(() => {
+        setIsGenerating(false);
+      }, 500);
+    }
   };
 
   return (
     <div style={styles.page}>
       <div style={styles.container}>
         <div style={styles.header}>
-          <div style={styles.badge}>
-            Customer Review
-          </div>
-
           <h1 style={styles.title}>
             Share Your Experience
           </h1>
 
           <p style={styles.subtitle}>
-            Tell us about your actual experience with{" "}
-            <strong>Jaisavaal Packers & Movers</strong>.
+            NEW JAISAVAAL PACKERS & MOVERS AYODHYA
+          </p>
+
+          <p style={styles.description}>
+            Tell us about your actual experience and
+            we'll prepare a review for you.
           </p>
         </div>
 
@@ -212,100 +132,47 @@ export default function Review() {
           </label>
 
           <div style={styles.stars}>
-            {[1, 2, 3, 4, 5].map((value) => {
-              const selected =
-                value <= rating;
-
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() =>
-                    setRating(value as Rating)
-                  }
-                  aria-label={`${value} star rating`}
-                  style={{
-                    ...styles.starButton,
-                    opacity: selected ? 1 : 0.3,
-                  }}
-                >
-                  ★
-                </button>
-              );
-            })}
+            {[1, 2, 3, 4, 5].map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() =>
+                  setRating(value as Rating)
+                }
+                style={{
+                  ...styles.starButton,
+                  opacity: value <= rating ? 1 : 0.3,
+                }}
+                aria-label={`${value} star`}
+              >
+                ★
+              </button>
+            ))}
           </div>
 
           <div style={styles.ratingText}>
-            {ratingLabels[rating]}
+            {rating} / 5
           </div>
         </div>
 
         <div style={styles.card}>
-          <label style={styles.label}>
-            Moving From
-          </label>
-
-          <select
-            value={fromCity}
-            onChange={(event) =>
-              setFromCity(event.target.value)
-            }
-            style={styles.select}
-          >
-            {cities.map((city: string) => (
-              <option
-                value={city}
-                key={`from-${city}`}
-              >
-                {city}
-              </option>
-            ))}
-          </select>
-
           <label
-            style={{
-              ...styles.label,
-              marginTop: 18,
-            }}
+            htmlFor="service"
+            style={styles.label}
           >
-            Moving To
-          </label>
-
-          <select
-            value={toCity}
-            onChange={(event) =>
-              setToCity(event.target.value)
-            }
-            style={styles.select}
-          >
-            {cities.map((city: string) => (
-              <option
-                value={city}
-                key={`to-${city}`}
-              >
-                {city}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={styles.card}>
-          <label style={styles.label}>
             Service Used
           </label>
 
           <select
+            id="service"
             value={service}
             onChange={(event) =>
               setService(event.target.value)
             }
             style={styles.select}
           >
-            {services.map((item: string) => (
-              <option
-                value={item}
-                key={item}
-              >
+            {services.map((item) => (
+              <option key={item} value={item}>
                 {item}
               </option>
             ))}
@@ -314,406 +181,276 @@ export default function Review() {
 
         <div style={styles.card}>
           <label style={styles.label}>
-            What was your actual experience?
+            What was good about your experience?
           </label>
 
           <p style={styles.helper}>
-            Select only the things that genuinely
+            Select only the things that actually
             happened during your move.
           </p>
 
-          <div style={styles.experienceGrid}>
-            {experienceOptions.map(
-              (experience: string) => {
-                const selected =
-                  experiences.includes(experience);
+          <div style={styles.options}>
+            {experienceOptions.map((experience) => {
+              const selected =
+                experiences.includes(experience);
 
-                return (
-                  <button
-                    type="button"
-                    key={experience}
-                    onClick={() =>
-                      toggleExperience(experience)
-                    }
-                    style={{
-                      ...styles.experienceButton,
-                      ...(selected
-                        ? styles.experienceSelected
-                        : {}),
-                    }}
-                  >
-                    <span>
-                      {selected ? "✓" : "+"}
-                    </span>
+              return (
+                <button
+                  key={experience}
+                  type="button"
+                  onClick={() =>
+                    toggleExperience(experience)
+                  }
+                  style={{
+                    ...styles.option,
+                    ...(selected
+                      ? styles.optionSelected
+                      : {}),
+                  }}
+                >
+                  <span>
+                    {selected ? "✓" : "+"}
+                  </span>
 
-                    {experience}
-                  </button>
-                );
-              }
-            )}
+                  <span>{experience}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleGenerate}
-          disabled={generating}
-          style={{
-            ...styles.generateButton,
-            opacity: generating ? 0.7 : 1,
-          }}
-        >
-          {generating
-            ? "Generating..."
-            : "Generate My Review"}
-        </button>
-
-        {review && (
-          <div style={styles.resultCard}>
-            <div style={styles.resultHeader}>
-              <h2 style={styles.resultTitle}>
+        {generatedReview && (
+          <div style={styles.reviewCard}>
+            <div style={styles.reviewHeader}>
+              <strong>
                 Your Review
-              </h2>
+              </strong>
 
               {copied && (
-                <span style={styles.copiedBadge}>
-                  Copied
+                <span style={styles.copied}>
+                  Copied ✓
                 </span>
               )}
             </div>
 
-            <div style={styles.reviewBox}>
-              {review}
-            </div>
-
-            <p style={styles.notice}>
-              Review the text and edit anything that
-              does not exactly match your experience
-              before posting.
-            </p>
-
-            <div style={styles.actionGrid}>
-              <button
-                type="button"
-                onClick={handleCopy}
-                style={styles.copyButton}
-              >
-                {copied
-                  ? "✓ Copied"
-                  : "Copy Review"}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleOpenGoogle}
-                style={styles.googleButton}
-              >
-                Open Google Review
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleGenerateAndOpen}
-              style={styles.mainActionButton}
-            >
-              Generate New + Open Google
-            </button>
-
-            <p style={styles.pasteHelp}>
-              The review is copied to your clipboard.
-              After Google opens, paste it into the
-              review box, check/edit it, and submit it
-              yourself.
+            <p style={styles.reviewText}>
+              {generatedReview}
             </p>
           </div>
         )}
 
+        <button
+          type="button"
+          onClick={handleGenerate}
+          disabled={isGenerating}
+          style={{
+            ...styles.generateButton,
+            ...(isGenerating
+              ? styles.generateButtonDisabled
+              : {}),
+          }}
+        >
+          {isGenerating
+            ? "Preparing Review..."
+            : "Generate & Post Review"}
+        </button>
+
+        <p style={styles.note}>
+          Your review is copied automatically and
+          Google will open next. Please check and edit
+          the review before posting.
+        </p>
+
         <div style={styles.footer}>
-          <strong>Jaisavaal Packers & Movers</strong>
-          <span>
-            Your genuine experience helps others make
-            better decisions.
-          </span>
+          NEW JAISAVAAL PACKERS & MOVERS AYODHYA
         </div>
       </div>
     </div>
   );
 }
 
-const styles: Record<
-  string,
-  React.CSSProperties
-> = {
+const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: "100vh",
-    background:
-      "linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%)",
-    padding: "24px 14px 50px",
+    background: "#f6f7f9",
+    padding: "24px 16px 40px",
     boxSizing: "border-box",
     fontFamily:
-      "Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    color: "#172033",
+      "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif",
   },
 
   container: {
     width: "100%",
-    maxWidth: 680,
+    maxWidth: "620px",
     margin: "0 auto",
   },
 
   header: {
     textAlign: "center",
-    marginBottom: 24,
-  },
-
-  badge: {
-    display: "inline-block",
-    padding: "7px 12px",
-    borderRadius: 999,
-    background: "#e8f0ff",
-    color: "#2454a6",
-    fontSize: 12,
-    fontWeight: 700,
-    letterSpacing: 0.3,
-    marginBottom: 10,
+    marginBottom: "24px",
   },
 
   title: {
-    margin: 0,
-    fontSize: "clamp(28px, 7vw, 42px)",
-    lineHeight: 1.1,
-    fontWeight: 800,
+    margin: "0 0 8px",
+    fontSize: "28px",
+    lineHeight: 1.2,
+    fontWeight: 700,
   },
 
   subtitle: {
-    margin:
-      "12px auto 0",
-    maxWidth: 550,
-    color: "#687386",
-    fontSize: 15,
-    lineHeight: 1.6,
+    margin: "0 0 8px",
+    fontSize: "14px",
+    fontWeight: 700,
+  },
+
+  description: {
+    margin: 0,
+    color: "#666",
+    fontSize: "14px",
+    lineHeight: 1.5,
   },
 
   card: {
-    background: "#ffffff",
-    borderRadius: 18,
+    background: "#fff",
+    borderRadius: "16px",
     padding: "20px",
-    marginBottom: 14,
+    marginBottom: "14px",
     boxShadow:
-      "0 8px 28px rgba(15, 23, 42, 0.07)",
-    border: "1px solid #e8edf3",
-    boxSizing: "border-box",
+      "0 2px 12px rgba(0,0,0,0.06)",
   },
 
   label: {
     display: "block",
-    fontSize: 14,
-    fontWeight: 750,
-    marginBottom: 10,
+    fontSize: "16px",
+    fontWeight: 700,
+    marginBottom: "12px",
   },
 
   helper: {
-    margin: "-3px 0 14px",
-    color: "#788395",
-    fontSize: 13,
-    lineHeight: 1.5,
+    margin: "-4px 0 14px",
+    color: "#777",
+    fontSize: "13px",
+    lineHeight: 1.4,
   },
 
   stars: {
     display: "flex",
     justifyContent: "center",
-    gap: 5,
-    marginTop: 2,
+    gap: "6px",
   },
 
   starButton: {
-    border: 0,
+    border: "none",
     background: "transparent",
-    cursor: "pointer",
-    fontSize: 40,
+    fontSize: "42px",
     lineHeight: 1,
+    cursor: "pointer",
     padding: "2px 5px",
-    color: "#f5b400",
   },
 
   ratingText: {
     textAlign: "center",
-    marginTop: 8,
-    color: "#667085",
-    fontSize: 13,
-    fontWeight: 600,
+    marginTop: "8px",
+    fontSize: "14px",
+    color: "#666",
   },
 
   select: {
     width: "100%",
-    height: 48,
-    padding: "0 13px",
-    borderRadius: 11,
-    border: "1px solid #d7dde6",
+    padding: "13px 14px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
     background: "#fff",
-    color: "#172033",
-    fontSize: 15,
+    fontSize: "15px",
     outline: "none",
     boxSizing: "border-box",
   },
 
-  experienceGrid: {
-    display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(145px, 1fr))",
-    gap: 9,
+  options: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "9px",
   },
 
-  experienceButton: {
-    minHeight: 46,
-    borderRadius: 11,
-    border: "1px solid #dbe1e9",
-    background: "#f9fafb",
-    color: "#374151",
-    cursor: "pointer",
-    padding: "9px 10px",
-    fontSize: 13,
-    fontWeight: 600,
-    textAlign: "left",
+  option: {
+    width: "100%",
     display: "flex",
     alignItems: "center",
-    gap: 7,
+    gap: "10px",
+    padding: "13px 14px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+    background: "#fff",
+    fontSize: "14px",
+    textAlign: "left",
+    cursor: "pointer",
   },
 
-  experienceSelected: {
-    background: "#edf5ff",
-    border: "1px solid #4b83dc",
-    color: "#174a91",
+  optionSelected: {
+    border: "1px solid #222",
+    background: "#f1f1f1",
+    fontWeight: 600,
+  },
+
+  reviewCard: {
+    background: "#fff",
+    borderRadius: "16px",
+    padding: "20px",
+    marginBottom: "14px",
+    boxShadow:
+      "0 2px 12px rgba(0,0,0,0.06)",
+  },
+
+  reviewHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "12px",
+  },
+
+  copied: {
+    fontSize: "13px",
+    fontWeight: 600,
+  },
+
+  reviewText: {
+    margin: 0,
+    fontSize: "15px",
+    lineHeight: 1.65,
+    color: "#333",
   },
 
   generateButton: {
     width: "100%",
-    minHeight: 54,
-    border: 0,
-    borderRadius: 14,
-    background:
-      "linear-gradient(135deg, #155eef, #3b82f6)",
-    color: "#ffffff",
-    cursor: "pointer",
-    fontSize: 16,
-    fontWeight: 800,
-    boxShadow:
-      "0 8px 22px rgba(37, 99, 235, 0.24)",
-    marginBottom: 16,
-  },
-
-  resultCard: {
-    background: "#ffffff",
-    borderRadius: 18,
-    padding: 20,
-    boxShadow:
-      "0 8px 28px rgba(15, 23, 42, 0.08)",
-    border: "1px solid #e4e9f0",
-  },
-
-  resultHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    marginBottom: 12,
-  },
-
-  resultTitle: {
-    margin: 0,
-    fontSize: 20,
-    fontWeight: 800,
-  },
-
-  copiedBadge: {
-    background: "#eaf8ef",
-    color: "#16803c",
-    padding: "5px 9px",
-    borderRadius: 999,
-    fontSize: 12,
+    border: "none",
+    borderRadius: "14px",
+    padding: "16px 20px",
+    background: "#111",
+    color: "#fff",
+    fontSize: "16px",
     fontWeight: 700,
-  },
-
-  reviewBox: {
-    background: "#f7f9fc",
-    border: "1px solid #e2e7ee",
-    borderRadius: 13,
-    padding: 16,
-    fontSize: 15,
-    lineHeight: 1.7,
-    color: "#293548",
-    whiteSpace: "pre-wrap",
-  },
-
-  notice: {
-    margin:
-      "11px 0 14px",
-    fontSize: 12,
-    lineHeight: 1.55,
-    color: "#7a8494",
-  },
-
-  actionGrid: {
-    display: "grid",
-    gridTemplateColumns:
-      "repeat(auto-fit, minmax(170px, 1fr))",
-    gap: 9,
-  },
-
-  copyButton: {
-    minHeight: 48,
-    borderRadius: 11,
-    border: "1px solid #cfd7e3",
-    background: "#ffffff",
-    color: "#263449",
     cursor: "pointer",
-    fontSize: 14,
-    fontWeight: 750,
+    boxShadow:
+      "0 4px 14px rgba(0,0,0,0.15)",
   },
 
-  googleButton: {
-    minHeight: 48,
-    borderRadius: 11,
-    border: 0,
-    background: "#1f2937",
-    color: "#ffffff",
-    cursor: "pointer",
-    fontSize: 14,
-    fontWeight: 750,
+  generateButtonDisabled: {
+    opacity: 0.65,
+    cursor: "wait",
   },
 
-  mainActionButton: {
-    width: "100%",
-    minHeight: 50,
-    marginTop: 10,
-    border: 0,
-    borderRadius: 11,
-    background: "#0f766e",
-    color: "#ffffff",
-    cursor: "pointer",
-    fontSize: 14,
-    fontWeight: 800,
-  },
-
-  pasteHelp: {
+  note: {
     textAlign: "center",
-    margin:
-      "12px 5px 0",
-    fontSize: 12,
-    lineHeight: 1.55,
-    color: "#7a8494",
+    color: "#777",
+    fontSize: "12px",
+    lineHeight: 1.5,
+    margin: "12px 8px 0",
   },
 
   footer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 5,
     textAlign: "center",
-    marginTop: 24,
-    color: "#7a8494",
-    fontSize: 12,
-    lineHeight: 1.5,
+    color: "#999",
+    fontSize: "11px",
+    marginTop: "30px",
   },
 };
