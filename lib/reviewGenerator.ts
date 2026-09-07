@@ -134,14 +134,29 @@ const experienceMap: Record<string, string[]> = {
 };
 
 const keywordTemplates = [
-  (city: string) => `If you are looking for packers and movers in ${city}, this is a good option.`,
-  (city: string) => `For anyone searching for the best packers in ${city, this is worth considering.`,
-  (city: string) => `I can recommend them if you need a moving service in ${city}.`,
-  (city: string) => `A good option for packers and movers in ${city}.`,
-  (city: string) => `For my requirement, they provided one of the better moving services in ${city}.`,
-  (city: string) => `People looking for a reliable moving service in ${city} can consider them.`,
-  (city: string) => `Overall, I would consider them among the better packers in ${city}.`,
-  (city: string) => `If you need moving services around ${city}, their service is worth checking out.`,
+  (city: string) =>
+    `If you are looking for packers and movers in ${city}, this is a good option.`,
+
+  (city: string) =>
+    `For anyone searching for the best packers in ${city}, this is worth considering.`,
+
+  (city: string) =>
+    `I can recommend them if you need a moving service in ${city}.`,
+
+  (city: string) =>
+    `A good option for packers and movers in ${city}.`,
+
+  (city: string) =>
+    `For my requirement, they provided one of the better moving services in ${city}.`,
+
+  (city: string) =>
+    `People looking for a reliable moving service in ${city} can consider them.`,
+
+  (city: string) =>
+    `Overall, I would consider them among the better packers in ${city}.`,
+
+  (city: string) =>
+    `If you need moving services around ${city}, their service is worth checking out.`,
 ];
 
 const endings = [
@@ -151,7 +166,7 @@ const endings = [
   "Happy with the overall service and coordination.",
   "Overall, a positive experience and I would recommend the team.",
   "The service made my shifting process easier than expected.",
-  "I would definitely consider them again for a future move.",
+  "I would consider them again for a future move.",
   "Overall, a satisfactory experience from my side.",
   "Quite happy with the way the move was handled.",
   "Good experience overall and the team was cooperative.",
@@ -181,30 +196,35 @@ const serviceKeywords: Record<string, string[]> = {
     "house moving",
     "home relocation",
   ],
+
   "Office Shifting": [
     "office shifting",
     "office relocation",
     "commercial shifting",
     "office moving",
   ],
+
   "Packing & Moving": [
     "packing and moving",
     "packing and shifting",
     "moving service",
     "relocation service",
   ],
+
   "Bike Transportation": [
     "bike transportation",
     "bike shifting",
     "two-wheeler transportation",
     "bike relocation",
   ],
+
   "Car Transportation": [
     "car transportation",
     "car shifting",
     "vehicle transportation",
     "car relocation",
   ],
+
   "Loading & Unloading": [
     "loading and unloading",
     "loading service",
@@ -241,8 +261,9 @@ function buildReview(options: ReviewOptions): string {
 
   const parts: string[] = [];
 
-  const intro = randomItem(introductions);
-  parts.push(`${intro} ${BUSINESS} for ${service.toLowerCase()}.`);
+  parts.push(
+    `${randomItem(introductions)} ${BUSINESS} for ${service.toLowerCase()}.`
+  );
 
   if (fromCity && toCity) {
     parts.push(
@@ -264,25 +285,34 @@ function buildReview(options: ReviewOptions): string {
   }
 
   if (
+    fromCity &&
+    toCity &&
     fromCity !== toCity &&
-    (service.toLowerCase().includes("transport") ||
-      service.toLowerCase().includes("shift") ||
-      randomChance(60))
+    randomChance(60)
   ) {
     parts.push(randomItem(transportSentences));
   }
 
   if (experiences.length > 0) {
     const usableExperiences = experiences
-      .flatMap((experience) => experienceMap[experience] || [])
+      .flatMap(
+        (experience) => experienceMap[experience] || []
+      )
       .filter(Boolean);
 
     if (usableExperiences.length > 0) {
-      const selected = [...usableExperiences]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, Math.min(2, usableExperiences.length));
+      const shuffled = [...usableExperiences].sort(
+        () => Math.random() - 0.5
+      );
 
-      selected.forEach((sentence) => parts.push(sentence));
+      const selected = shuffled.slice(
+        0,
+        Math.min(2, shuffled.length)
+      );
+
+      selected.forEach((sentence) => {
+        parts.push(sentence);
+      });
     }
   }
 
@@ -291,10 +321,14 @@ function buildReview(options: ReviewOptions): string {
   }
 
   if (randomChance(50)) {
-    const keywordCity = randomChance(50) ? fromCity : toCity;
+    const keywordCity =
+      randomChance(50) ? fromCity : toCity;
 
     if (keywordCity) {
-      parts.push(randomItem(keywordTemplates)(keywordCity));
+      const keywordTemplate =
+        randomItem(keywordTemplates);
+
+      parts.push(keywordTemplate(keywordCity));
     }
   }
 
@@ -323,7 +357,9 @@ function buildReview(options: ReviewOptions): string {
   return cleanText(parts.join(" "));
 }
 
-export function generateReview(options: ReviewOptions): string {
+export function generateReview(
+  options: ReviewOptions
+): string {
   let review = "";
   let attempts = 0;
 
