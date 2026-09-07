@@ -1,23 +1,56 @@
 // lib/reviewGenerator.ts
 
-export const BUSINESS = "jaisaval Packers & Movers";
+export const BUSINESS = "NEW JAISAVAAL PACKERS & MOVERS AYODHYA";
 
 export type Rating = 1 | 2 | 3 | 4 | 5;
 
 export type ReviewOptions = {
   rating: Rating;
-  fromCity: string;
-  toCity: string;
   service: string;
   experiences: string[];
 };
+
+const majorCities = [
+  "Ayodhya",
+  "Faizabad",
+  "Lucknow",
+  "Varanasi",
+  "Prayagraj",
+  "Gorakhpur",
+  "Kanpur",
+  "Delhi",
+  "New Delhi",
+  "Noida",
+  "Greater Noida",
+  "Ghaziabad",
+  "Agra",
+  "Meerut",
+  "Bareilly",
+  "Aligarh",
+  "Moradabad",
+  "Mathura",
+  "Vrindavan",
+  "Jaipur",
+  "Chandigarh",
+  "Gurugram",
+  "Faridabad",
+  "Dehradun",
+  "Haridwar",
+  "Amritsar",
+  "Ludhiana",
+  "Patiala",
+  "Kota",
+  "Bhopal",
+  "Indore",
+  "Raipur",
+];
 
 const introductions = [
   "Had a good experience with",
   "Recently used",
   "I had a smooth experience with",
   "Really happy with the service from",
-  "Used",
+  "Used the services of",
   "My experience with",
   "Quite satisfied with",
   "Overall, I had a good experience with",
@@ -62,6 +95,8 @@ const packingSentences = [
   "The workers were careful while handling the items during packing.",
   "The packing work was done neatly and without unnecessary confusion.",
   "The team managed the packing work quite efficiently.",
+  "The items were packed in an organised manner.",
+  "The packing process was handled carefully by the team.",
 ];
 
 const transportSentences = [
@@ -147,7 +182,7 @@ const keywordTemplates = [
     `A good option for packers and movers in ${city}.`,
 
   (city: string) =>
-    `For my requirement, they provided one of the better moving services in ${city}.`,
+    `For my requirement, they provided a good moving service in ${city}.`,
 
   (city: string) =>
     `People looking for a reliable moving service in ${city} can consider them.`,
@@ -157,12 +192,24 @@ const keywordTemplates = [
 
   (city: string) =>
     `If you need moving services around ${city}, their service is worth checking out.`,
+
+  (city: string) =>
+    `I would suggest checking them out if you need packers and movers in ${city}.`,
+
+  (city: string) =>
+    `For anyone planning a move in ${city}, they are worth considering.`,
+
+  (city: string) =>
+    `Good option if you are searching for a moving service in ${city}.`,
+
+  (city: string) =>
+    `My experience was good and I would recommend them for moving services in ${city}.`,
 ];
 
 const endings = [
   "Overall, it was a convenient experience and I would consider using them again.",
   "Overall satisfied with the service and would recommend them.",
-  "The whole process was fairly smooth and I would recommend them.",
+  "The whole process was fairly smooth and I would recommend the team.",
   "Happy with the overall service and coordination.",
   "Overall, a positive experience and I would recommend the team.",
   "The service made my shifting process easier than expected.",
@@ -253,11 +300,18 @@ function cleanText(text: string): string {
 function buildReview(options: ReviewOptions): string {
   const {
     rating,
-    fromCity,
-    toCity,
     service,
     experiences,
   } = options;
+
+  // Automatically choose two different cities.
+  const fromCity = randomItem(majorCities);
+
+  let toCity = randomItem(majorCities);
+
+  while (toCity === fromCity) {
+    toCity = randomItem(majorCities);
+  }
 
   const parts: string[] = [];
 
@@ -265,15 +319,9 @@ function buildReview(options: ReviewOptions): string {
     `${randomItem(introductions)} ${BUSINESS} for ${service.toLowerCase()}.`
   );
 
-  if (fromCity && toCity) {
-    parts.push(
-      `I needed to move from ${fromCity} to ${toCity}, and the overall coordination was handled well.`
-    );
-  } else if (fromCity) {
-    parts.push(
-      `I needed moving assistance in ${fromCity}, and the overall coordination was handled well.`
-    );
-  }
+  parts.push(
+    `I needed to move from ${fromCity} to ${toCity}, and the overall coordination was handled well.`
+  );
 
   parts.push(randomItem(serviceSentences));
 
@@ -284,12 +332,7 @@ function buildReview(options: ReviewOptions): string {
     parts.push(randomItem(packingSentences));
   }
 
-  if (
-    fromCity &&
-    toCity &&
-    fromCity !== toCity &&
-    randomChance(60)
-  ) {
+  if (fromCity !== toCity && randomChance(60)) {
     parts.push(randomItem(transportSentences));
   }
 
@@ -316,23 +359,24 @@ function buildReview(options: ReviewOptions): string {
     }
   }
 
+  // Occasional natural Hinglish.
   if (randomChance(35)) {
     parts.push(randomItem(hinglishLines));
   }
 
-  if (randomChance(50)) {
-    const keywordCity =
-      randomChance(50) ? fromCity : toCity;
+  // Naturally include a location-based keyword.
+  if (randomChance(60)) {
+    const keywordCity = randomChance(50)
+      ? fromCity
+      : toCity;
 
-    if (keywordCity) {
-      const keywordTemplate =
-        randomItem(keywordTemplates);
+    const keywordTemplate = randomItem(keywordTemplates);
 
-      parts.push(keywordTemplate(keywordCity));
-    }
+    parts.push(keywordTemplate(keywordCity));
   }
 
-  if (randomChance(25)) {
+  // Add service-related wording sometimes.
+  if (randomChance(30)) {
     const keywords = serviceKeywords[service];
 
     if (keywords && keywords.length > 0) {
