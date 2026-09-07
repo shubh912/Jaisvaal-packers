@@ -7,7 +7,7 @@ import {
 } from "../lib/reviewGenerator";
 
 const GOOGLE_REVIEW_URL =
-  "https://share.google/fBdd3U8mb7QdD9PbE";
+  "https://search.google.com/local/writereview?placeid=ChIJdYydppQPmjkRFZ2J-aH6BWM";
 
 const services = [
   "House Shifting",
