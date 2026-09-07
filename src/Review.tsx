@@ -1,434 +1,662 @@
-import { useMemo, useState } from "react";
+import React, { useState } from 'react';
 import {
-  Check,
-  ChevronDown,
+  Alert,
   Clipboard,
-  ExternalLink,
-  MapPin,
-  RefreshCw,
-  Send,
-  Star,
-  Truck,
-} from "lucide-react";
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 import {
-  EXPERIENCE_POINTS,
-  GOOGLE_REVIEW_URL,
-  LOCATIONS,
+  BUSINESS,
+  EXPERIENCES,
+  MAJOR_CITIES,
   SERVICES,
-  generateReview,
-  type ReviewInput,
-} from "../lib/reviewGenerator";
+  ReviewRating,
+  generateUniqueReview,
+} from '../../lib/reviewGenerator';
 
-const DEFAULT_EXPERIENCE = EXPERIENCE_POINTS.slice(0, 3);
+const GOOGLE_REVIEW_URL =
+  'https://maps.app.goo.gl/Bcj1gqt2r6TR7Htq5';
 
 export default function Review() {
-  const [stars, setStars] = useState(5);
-  const [service, setService] = useState("Household Shifting");
-  const [from, setFrom] = useState("Ayodhya");
-  const [to, setTo] = useState("Lucknow");
-  const [experiencePoints, setExperiencePoints] =
-    useState<string[]>(DEFAULT_EXPERIENCE);
-  const [customNote, setCustomNote] = useState("");
-  const [copied, setCopied] = useState(false);
+  const [rating, setRating] = useState<ReviewRating>(5);
+  const [fromCity, setFromCity] = useState('Ayodhya');
+  const [toCity, setToCity] = useState('Lucknow');
+  const [service, setService] = useState('House Shifting');
 
-  const input: ReviewInput = useMemo(
-    () => ({
-      stars,
-      service,
-      from,
-      to,
-      experiencePoints,
-      customNote,
-    }),
-    [stars, service, from, to, experiencePoints, customNote]
+  const [selectedExperiences, setSelectedExperiences] = useState<string[]>(
+    [],
   );
 
-  const [review, setReview] = useState(() => generateReview(input));
+  const [review, setReview] = useState('');
+  const [copied, setCopied] = useState(false);
 
-  const toggleExperience = (point: string) => {
-    setExperiencePoints((current) => {
-      if (current.includes(point)) {
-        return current.filter((item) => item !== point);
+  const toggleExperience = (id: string) => {
+    setSelectedExperiences((current) => {
+      if (current.includes(id)) {
+        return current.filter((item) => item !== id);
       }
 
       if (current.length >= 4) {
         return current;
       }
 
-      return [...current, point];
+      return [...current, id];
     });
   };
 
-  const generate = () => {
+  const generate = async () => {
+    if (!fromCity || !toCity) {
+      Alert.alert(
+        'Select locations',
+        'Please select both pickup and destination cities.',
+      );
+      return;
+    }
+
+    if (!service) {
+      Alert.alert('Select service', 'Please select the service you used.');
+      return;
+    }
+
+    if (selectedExperiences.length === 0) {
+      Alert.alert(
+        'Select your experience',
+        'Please select at least one thing that was actually part of your experience.',
+      );
+      return;
+    }
+
+    const generated = generateUniqueReview({
+      rating,
+      fromCity,
+      toCity,
+      service,
+      experiences: selectedExperiences,
+    });
+
+    setReview(generated);
     setCopied(false);
 
-    const nextInput: ReviewInput = {
-      stars,
-      service,
-      from,
-      to,
-      experiencePoints,
-      customNote,
-    };
-
-    setReview(generateReview(nextInput));
-  };
-
-  const copyReview = async () => {
     try {
-      await navigator.clipboard.writeText(review);
+      await Clipboard.setStringAsync(generated);
       setCopied(true);
-
-      window.setTimeout(() => {
-        setCopied(false);
-      }, 2500);
     } catch {
-      const textarea = document.createElement("textarea");
-      textarea.value = review;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-
-      document.body.appendChild(textarea);
-      textarea.select();
-      document.execCommand("copy");
-      textarea.remove();
-
-      setCopied(true);
-
-      window.setTimeout(() => {
-        setCopied(false);
-      }, 2500);
+      setCopied(false);
     }
   };
 
-  const openGoogleReview = () => {
-    window.open(GOOGLE_REVIEW_URL, "_blank", "noopener,noreferrer");
+  const copyReview = async () => {
+    if (!review) {
+      Alert.alert('Generate a review first');
+      return;
+    }
+
+    try {
+      await Clipboard.setStringAsync(review);
+      setCopied(true);
+
+      Alert.alert(
+        'Review copied',
+        'Your review has been copied. You can now open Google and paste it into the review box.',
+      );
+    } catch {
+      Alert.alert(
+        'Copy failed',
+        'Please select and copy the review manually.',
+      );
+    }
+  };
+
+  const openGoogleReview = async () => {
+    if (!review) {
+      Alert.alert(
+        'Generate review first',
+        'Please generate your review before opening Google.',
+      );
+      return;
+    }
+
+    // Make one final clipboard copy immediately before opening Google.
+    try {
+      await Clipboard.setStringAsync(review);
+      setCopied(true);
+    } catch {
+      // Continue to Google even if clipboard copying fails.
+    }
+
+    try {
+      await Linking.openURL(GOOGLE_REVIEW_URL);
+    } catch {
+      Alert.alert(
+        'Unable to open Google',
+        'Please open Google Maps manually and paste your copied review.',
+      );
+    }
   };
 
   return (
-    <main className="min-h-screen bg-[#FFFCF5] text-[#12151A]">
-      <div className="mx-auto w-full max-w-3xl px-4 py-6 md:px-6 md:py-10">
-        {/* Header */}
-        <section className="rounded-3xl bg-[#0F1220] p-6 text-white shadow-xl md:p-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#FF6B00]">
-              <Truck size={24} />
-            </div>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
+      <View style={styles.header}>
+        <Text style={styles.title}>Share Your Experience</Text>
 
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-                Customer Feedback
-              </p>
+        <Text style={styles.subtitle}>
+          Tell us about your actual experience with {BUSINESS}.
+        </Text>
+      </View>
 
-              <h1 className="text-xl font-extrabold md:text-2xl">
-                NEW JAISAVAAL PACKERS & MOVERS
-              </h1>
+      {/* RATING */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Your rating</Text>
 
-              <p className="mt-1 text-sm text-white/70">
-                Ayodhya
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4">
-            <p className="text-sm leading-6 text-white/80">
-              Share your genuine experience. Select the details that actually
-              match your move, then edit the generated text before posting.
-            </p>
-          </div>
-        </section>
-
-        {/* Rating */}
-        <section className="mt-5 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:p-7">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-extrabold">Your rating</h2>
-              <p className="mt-1 text-sm text-black/50">
-                Choose the rating that matches your experience.
-              </p>
-            </div>
-
-            <span className="rounded-full bg-[#FFF1E7] px-3 py-1 text-sm font-bold text-[#FF6B00]">
-              {stars}/5
-            </span>
-          </div>
-
-          <div className="mt-5 flex gap-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                aria-label={`${star} star`}
-                onClick={() => {
-                  setStars(star);
-                  setCopied(false);
-                }}
-                className="rounded-xl p-1 transition-transform active:scale-90"
-              >
-                <Star
-                  size={38}
-                  fill={star <= stars ? "#FFB000" : "transparent"}
-                  className={
-                    star <= stars
-                      ? "text-[#FFB000]"
-                      : "text-black/20"
-                  }
-                />
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* Service */}
-        <section className="mt-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:p-7">
-          <h2 className="font-extrabold">What service did you use?</h2>
-
-          <div className="relative mt-3">
-            <select
-              value={service}
-              onChange={(e) => setService(e.target.value)}
-              className="w-full appearance-none rounded-2xl border border-black/10 bg-[#FFFCF5] px-4 py-4 pr-11 text-sm font-semibold outline-none focus:border-[#FF6B00]"
+        <View style={styles.ratingRow}>
+          {[1, 2, 3, 4, 5].map((value) => (
+            <TouchableOpacity
+              key={value}
+              onPress={() => setRating(value as ReviewRating)}
+              style={[
+                styles.starButton,
+                rating >= value && styles.starButtonActive,
+              ]}
             >
-              {SERVICES.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
+              <Text
+                style={[
+                  styles.star,
+                  rating >= value && styles.starActive,
+                ]}
+              >
+                ★
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-            <ChevronDown
-              size={19}
-              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2"
-            />
-          </div>
-        </section>
+        <Text style={styles.ratingText}>
+          {rating}/5
+        </Text>
+      </View>
 
-        {/* Route */}
-        <section className="mt-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:p-7">
-          <h2 className="font-extrabold">Move details</h2>
+      {/* ROUTE */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Your move</Text>
 
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <LocationSelect
-              label="From"
-              value={from}
-              onChange={setFrom}
-            />
+        <Text style={styles.label}>From</Text>
 
-            <LocationSelect
-              label="To"
-              value={to}
-              onChange={setTo}
-            />
-          </div>
-        </section>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalList}
+        >
+          {MAJOR_CITIES.map((city) => (
+            <TouchableOpacity
+              key={`from-${city}`}
+              onPress={() => setFromCity(city)}
+              style={[
+                styles.chip,
+                fromCity === city && styles.chipActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  fromCity === city && styles.chipTextActive,
+                ]}
+              >
+                {city}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-        {/* Experience */}
-        <section className="mt-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:p-7">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <h2 className="font-extrabold">What actually stood out?</h2>
-              <p className="mt-1 text-sm text-black/50">
-                Select up to 4 things that match your experience.
-              </p>
-            </div>
+        <Text style={styles.selectedText}>
+          Pickup: {fromCity}
+        </Text>
 
-            <span className="shrink-0 text-xs font-bold text-black/40">
-              {experiencePoints.length}/4
-            </span>
-          </div>
+        <Text style={styles.label}>To</Text>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {EXPERIENCE_POINTS.map((point) => {
-              const selected = experiencePoints.includes(point);
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.horizontalList}
+        >
+          {MAJOR_CITIES.map((city) => (
+            <TouchableOpacity
+              key={`to-${city}`}
+              onPress={() => setToCity(city)}
+              style={[
+                styles.chip,
+                toCity === city && styles.chipActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  toCity === city && styles.chipTextActive,
+                ]}
+              >
+                {city}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
 
-              return (
-                <button
-                  key={point}
-                  type="button"
-                  onClick={() => toggleExperience(point)}
-                  className={[
-                    "rounded-full border px-4 py-2.5 text-sm font-semibold transition",
-                    selected
-                      ? "border-[#FF6B00] bg-[#FF6B00] text-white"
-                      : "border-black/10 bg-[#FFFCF5] text-black/70",
-                  ].join(" ")}
+        <Text style={styles.selectedText}>
+          Destination: {toCity}
+        </Text>
+      </View>
+
+      {/* SERVICE */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>Service used</Text>
+
+        <View style={styles.wrap}>
+          {SERVICES.map((item) => (
+            <TouchableOpacity
+              key={item}
+              onPress={() => setService(item)}
+              style={[
+                styles.chip,
+                service === item && styles.chipActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  service === item && styles.chipTextActive,
+                ]}
+              >
+                {item}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* EXPERIENCE */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>
+          What was actually good?
+        </Text>
+
+        <Text style={styles.helperText}>
+          Select only things that match your real experience.
+        </Text>
+
+        <View style={styles.wrap}>
+          {EXPERIENCES.map((experience) => {
+            const selected = selectedExperiences.includes(
+              experience.id,
+            );
+
+            return (
+              <TouchableOpacity
+                key={experience.id}
+                onPress={() => toggleExperience(experience.id)}
+                style={[
+                  styles.experienceItem,
+                  selected && styles.experienceItemActive,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.checkbox,
+                    selected && styles.checkboxActive,
+                  ]}
                 >
                   {selected && (
-                    <Check size={15} className="mr-1.5 inline" />
+                    <Text style={styles.checkmark}>✓</Text>
                   )}
-                  {point}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+                </View>
 
-        {/* Optional customer note */}
-        <section className="mt-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:p-7">
-          <h2 className="font-extrabold">
-            Add your own words
-            <span className="ml-2 text-xs font-medium text-black/40">
-              Optional
-            </span>
-          </h2>
+                <Text
+                  style={[
+                    styles.experienceText,
+                    selected && styles.experienceTextActive,
+                  ]}
+                >
+                  {experience.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
 
-          <textarea
-            value={customNote}
-            onChange={(e) => setCustomNote(e.target.value)}
-            placeholder="Example: Driver reached on time and the cartons were properly labelled."
-            rows={4}
-            maxLength={300}
-            className="mt-4 w-full resize-none rounded-2xl border border-black/10 bg-[#FFFCF5] p-4 text-sm leading-6 outline-none focus:border-[#FF6B00]"
-          />
+      {/* GENERATE */}
+      <TouchableOpacity
+        style={styles.generateButton}
+        onPress={generate}
+      >
+        <Text style={styles.generateButtonText}>
+          Generate My Review
+        </Text>
+      </TouchableOpacity>
 
-          <p className="mt-2 text-right text-xs text-black/40">
-            {customNote.length}/300
-          </p>
-        </section>
+      {/* GENERATED REVIEW */}
+      {review ? (
+        <View style={styles.reviewCard}>
+          <View style={styles.reviewHeader}>
+            <Text style={styles.sectionTitle}>
+              Your review
+            </Text>
 
-        {/* Generate */}
-        <button
-          type="button"
-          onClick={generate}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#FF6B00] px-5 py-4 font-extrabold text-white shadow-lg shadow-orange-500/20 transition active:scale-[0.99]"
-        >
-          <RefreshCw size={19} />
-          Generate Review
-        </button>
+            {copied && (
+              <Text style={styles.copiedText}>
+                ✓ Copied
+              </Text>
+            )}
+          </View>
 
-        {/* Review */}
-        <section className="mt-5 rounded-3xl bg-[#0F1220] p-5 text-white shadow-xl md:p-7">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.15em] text-white/50">
-                Generated review
-              </p>
-
-              <div className="mt-2 flex gap-1">
-                {Array.from({ length: stars }).map((_, index) => (
-                  <Star
-                    key={index}
-                    size={16}
-                    fill="#FFB000"
-                    className="text-[#FFB000]"
-                  />
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={generate}
-              className="rounded-xl border border-white/10 p-2.5 text-white/70 hover:bg-white/10"
-              aria-label="Generate another version"
-            >
-              <RefreshCw size={18} />
-            </button>
-          </div>
-
-          <div className="mt-5 rounded-2xl bg-white/5 p-5">
-            <p className="text-[15px] leading-7 text-white/90">
+          <View style={styles.reviewBox}>
+            <Text style={styles.reviewText}>
               {review}
-            </p>
-          </div>
+            </Text>
+          </View>
 
-          <p className="mt-4 text-xs leading-5 text-white/45">
-            Please read and edit this before posting. Only post it if it
-            accurately describes your own experience.
-          </p>
-        </section>
-
-        {/* Actions */}
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <button
-            type="button"
-            onClick={copyReview}
-            className="flex items-center justify-center gap-2 rounded-2xl border border-black/10 bg-white px-5 py-4 font-extrabold shadow-sm"
+          <TouchableOpacity
+            style={styles.copyButton}
+            onPress={copyReview}
           >
-            {copied ? <Check size={19} /> : <Clipboard size={19} />}
-            {copied ? "Copied!" : "Copy Review"}
-          </button>
+            <Text style={styles.copyButtonText}>
+              {copied ? 'Copy Again' : 'Copy Review'}
+            </Text>
+          </TouchableOpacity>
 
-          <button
-            type="button"
-            onClick={openGoogleReview}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-[#0F1220] px-5 py-4 font-extrabold text-white shadow-sm"
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={openGoogleReview}
           >
-            <ExternalLink size={19} />
-            Open Google Review
-          </button>
-        </div>
+            <Text style={styles.googleButtonText}>
+              Open Google Review
+            </Text>
+          </TouchableOpacity>
 
-        {/* Instructions */}
-        <section className="mt-5 rounded-3xl border border-[#FF6B00]/20 bg-[#FFF7EF] p-5 md:p-6">
-          <div className="flex gap-3">
-            <MapPin
-              size={21}
-              className="mt-0.5 shrink-0 text-[#FF6B00]"
-            />
+          <Text style={styles.notice}>
+            Your review is copied before Google opens. Please paste it,
+            check that it accurately reflects your experience, make any
+            changes you want, and submit it yourself.
+          </Text>
+        </View>
+      ) : null}
 
-            <div>
-              <h3 className="font-extrabold">
-                How to post
-              </h3>
-
-              <ol className="mt-2 space-y-2 text-sm leading-6 text-black/65">
-                <li>1. Read the generated review.</li>
-                <li>2. Edit anything that isn't accurate.</li>
-                <li>3. Tap "Copy Review".</li>
-                <li>4. Open Google Review.</li>
-                <li>5. Select your rating and paste your review.</li>
-                <li>6. Post it from your own Google account.</li>
-              </ol>
-            </div>
-          </div>
-        </section>
-
-        <p className="px-4 py-6 text-center text-xs leading-5 text-black/40">
-          Reviews should reflect your genuine experience. You are free to
-          edit, shorten, or completely rewrite the generated text before
-          posting.
-        </p>
-      </div>
-    </main>
+      <View style={styles.footerSpace} />
+    </ScrollView>
   );
 }
 
-function LocationSelect({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div>
-      <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-black/40">
-        {label}
-      </label>
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    paddingBottom: 40,
+    backgroundColor: '#F7F8FA',
+  },
 
-      <div className="relative">
-        <MapPin
-          size={17}
-          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-[#FF6B00]"
-        />
+  header: {
+    marginBottom: 18,
+  },
 
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full appearance-none rounded-2xl border border-black/10 bg-[#FFFCF5] py-4 pl-11 pr-11 text-sm font-semibold outline-none focus:border-[#FF6B00]"
-        >
-          {LOCATIONS.map((location) => (
-            <option key={location}>{location}</option>
-          ))}
-        </select>
+  title: {
+    fontSize: 27,
+    fontWeight: '800',
+    color: '#111827',
+    marginBottom: 6,
+  },
 
-        <ChevronDown
-          size={18}
-          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2"
-        />
-      </div>
-    </div>
-  );
-}
+  subtitle: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#6B7280',
+  },
+
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 12,
+  },
+
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  starButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+  },
+
+  starButtonActive: {
+    backgroundColor: '#FFF7D6',
+  },
+
+  star: {
+    fontSize: 28,
+    color: '#D1D5DB',
+  },
+
+  starActive: {
+    color: '#F59E0B',
+  },
+
+  ratingText: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
+
+  label: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#374151',
+    marginTop: 6,
+    marginBottom: 8,
+  },
+
+  horizontalList: {
+    marginHorizontal: -4,
+  },
+
+  chip: {
+    paddingHorizontal: 13,
+    paddingVertical: 9,
+    borderRadius: 20,
+    backgroundColor: '#F3F4F6',
+    marginHorizontal: 4,
+    marginVertical: 4,
+  },
+
+  chipActive: {
+    backgroundColor: '#111827',
+  },
+
+  chipText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
+  },
+
+  chipTextActive: {
+    color: '#FFFFFF',
+  },
+
+  selectedText: {
+    fontSize: 13,
+    color: '#6B7280',
+    marginTop: 5,
+    marginBottom: 8,
+  },
+
+  wrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -4,
+  },
+
+  helperText: {
+    fontSize: 13,
+    lineHeight: 19,
+    color: '#6B7280',
+    marginBottom: 10,
+  },
+
+  experienceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    margin: 4,
+    borderRadius: 12,
+    backgroundColor: '#F3F4F6',
+  },
+
+  experienceItemActive: {
+    backgroundColor: '#111827',
+  },
+
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#9CA3AF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+
+  checkboxActive: {
+    backgroundColor: '#FFFFFF',
+    borderColor: '#FFFFFF',
+  },
+
+  checkmark: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: '#111827',
+  },
+
+  experienceText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
+  },
+
+  experienceTextActive: {
+    color: '#FFFFFF',
+  },
+
+  generateButton: {
+    minHeight: 54,
+    borderRadius: 15,
+    backgroundColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+    marginBottom: 14,
+  },
+
+  generateButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+
+  reviewCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+
+  reviewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  copiedText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#16A34A',
+  },
+
+  reviewBox: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    padding: 15,
+    marginBottom: 12,
+  },
+
+  reviewText: {
+    fontSize: 15,
+    lineHeight: 24,
+    color: '#1F2937',
+  },
+
+  copyButton: {
+    minHeight: 50,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+
+  copyButtonText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#111827',
+  },
+
+  googleButton: {
+    minHeight: 54,
+    borderRadius: 13,
+    backgroundColor: '#111827',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  googleButtonText: {
+    fontSize: 15,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+
+  notice: {
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 12,
+  },
+
+  footerSpace: {
+    height: 30,
+  },
+});
