@@ -1,6 +1,6 @@
 // lib/reviewGenerator.ts
 
-export const BUSINESS = "Saket Packers & Movers";
+export const BUSINESS = "jaisaval Packers & Movers";
 
 export type Rating = 1 | 2 | 3 | 4 | 5;
 
