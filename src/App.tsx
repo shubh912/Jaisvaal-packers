@@ -16,9 +16,10 @@ const WHATSAPP = `https://wa.me/919194044482?text=${encodeURIComponent("Namaste 
 const GSTIN = "09AVRPJ3630K1Z5";
 const ADDRESS = "Shop No. 284, T.P. Nagar Gate No. 1, RTO Office, Ayodhya U.P. 224001";
 const SHORT_ADDR = "T.P. Nagar Gate No. 1, RTO Office, Ayodhya";
-const GMAP_EMBED = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3557.5!2d82.1895!3d26.7956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399a07937e6d2823%3A0x5fc0c1f2e5b3b3a1!2sAyodhya%20T.P.%20Nagar%20RTO%20Office!5e0!3m2!1sen!2sin!4v1690000000000!5m2!1sen!2sin";
-const GMAP_LINK = "https://maps.google.com/?q=NEW+JAISAVAAL+PACKERS+AYODHYA+Shop+No.+284+T.P.+Nagar+Gate+No.+1+RTO+Office";
 
+const GMAP_EMBED = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3562.5684875801594!2d82.1243367!3d26.758143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399a0f94a69d8c75%3A0x6305faa1f9899d15!2sNEW%20JAISAVAAL%20PACKERS%20%26%20MOVERS%20AYODHYA!5e0!3m2!1sen!2sin!4v1788785029796!5m2!1sen!2sin";
+
+const GMAP_LINK = "https://maps.app.goo.gl/Bcj1gqt2r6TR7Htq5";
 const keyServices = [
   { label: "Household Shifting", Icon: Home },
   { label: "Office Relocation", Icon: Building2 },
