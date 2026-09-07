@@ -1,339 +1,341 @@
 // lib/reviewGenerator.ts
 
-export const BUSINESS = 'Saket Packers & Movers';
+export const BUSINESS = "Saket Packers & Movers";
 
-export type ReviewRating = 3 | 4 | 5;
+export type Rating = 1 | 2 | 3 | 4 | 5;
 
-export type ReviewInput = {
-  rating: ReviewRating;
+export type ReviewOptions = {
+  rating: Rating;
   fromCity: string;
   toCity: string;
   service: string;
   experiences: string[];
 };
 
-const cities = [
-  'Ayodhya',
-  'Faizabad',
-  'Lucknow',
-  'Gorakhpur',
-  'Prayagraj',
-  'Varanasi',
-  'Kanpur',
-  'Delhi',
-  'Noida',
-  'Ghaziabad',
-  'Agra',
-  'Jaipur',
-  'Chandigarh',
-  'Gurugram',
-  'Meerut',
-  'Bareilly',
-  'Kanpur',
-  'Aligarh',
+const introductions = [
+  "Had a good experience with",
+  "Recently used",
+  "I had a smooth experience with",
+  "Really happy with the service from",
+  "Used",
+  "My experience with",
+  "Quite satisfied with",
+  "Overall, I had a good experience with",
+  "I recently booked",
+  "Glad I chose",
+  "Had a pretty smooth experience with",
+  "I used the services of",
+  "Overall happy with",
+  "My shifting experience with",
+  "I recently took help from",
+  "Booked",
+  "The overall experience with",
+  "I had a nice experience with",
+  "Very satisfied with",
+  "I was quite happy with",
 ];
 
-export const MAJOR_CITIES = cities;
-
-export const SERVICES = [
-  'House Shifting',
-  'Office Relocation',
-  'Local Shifting',
-  'Intercity Shifting',
-  'Bike Transport',
-  'Car Transport',
-  'Packing & Moving',
-  'Loading & Unloading',
+const serviceSentences = [
+  "The team handled the shifting work professionally.",
+  "The team was cooperative and easy to coordinate with.",
+  "The staff was polite and the overall process was well managed.",
+  "The team explained the process clearly and kept things simple.",
+  "The workers were responsive and completed the work properly.",
+  "The coordination was good from the beginning till the end.",
+  "The team arrived as discussed and got started without unnecessary delay.",
+  "The staff was helpful throughout the shifting process.",
+  "The overall coordination was smooth and convenient.",
+  "The team made the shifting process much easier for me.",
+  "The workers were professional and knew how to handle the shifting work.",
+  "Communication with the team was clear and straightforward.",
+  "The staff was friendly and cooperative during the process.",
+  "Everything was coordinated properly according to the requirements.",
+  "The team was responsive whenever I needed an update.",
 ];
 
-export const EXPERIENCES = [
-  {
-    id: 'packing',
-    label: 'Packing was good',
-    phrases: [
-      'The packing was done properly and everything was handled with care.',
-      'Packing was neat and the team handled the सामान carefully.',
-      'The packing team did a good job and took care of the items.',
-      'I was happy with how the सामान was packed and handled.',
-    ],
-  },
-  {
-    id: 'loading',
-    label: 'Loading was smooth',
-    phrases: [
-      'Loading was quite smooth and the team worked efficiently.',
-      'The loading process was well managed.',
-      'The team handled the loading properly without unnecessary delay.',
-      'Loading and handling were done in a professional way.',
-    ],
-  },
-  {
-    id: 'unloading',
-    label: 'Unloading was smooth',
-    phrases: [
-      'Unloading was also smooth and the items were handled carefully.',
-      'The unloading process was hassle free.',
-      'Everything was unloaded properly at the destination.',
-      'The team handled the unloading nicely.',
-    ],
-  },
-  {
-    id: 'staff',
-    label: 'Staff was cooperative',
-    phrases: [
-      'The staff was cooperative and easy to communicate with.',
-      'The team members were polite and helpful throughout.',
-      'Staff behaviour was good and they were responsive.',
-      'The team was friendly and cooperative.',
-    ],
-  },
-  {
-    id: 'ontime',
-    label: 'On-time service',
-    phrases: [
-      'The delivery was completed within the expected time.',
-      'The service was on time as discussed.',
-      'The shifting was completed without unnecessary delay.',
-      'The timing was handled well from pickup to delivery.',
-    ],
-  },
-  {
-    id: 'communication',
-    label: 'Good communication',
-    phrases: [
-      'Communication was clear throughout the shifting process.',
-      'They kept communication simple and clear.',
-      'It was easy to coordinate with the team.',
-      'The response and communication were good.',
-    ],
-  },
-  {
-    id: 'price',
-    label: 'Reasonable pricing',
-    phrases: [
-      'The pricing was reasonable for the service provided.',
-      'The charges were fair compared with the overall service.',
-      'Pricing was quite reasonable.',
-      'The service felt worth the price.',
-    ],
-  },
-  {
-    id: 'careful',
-    label: 'Items handled carefully',
-    phrases: [
-      'My items were handled carefully during the move.',
-      'I liked the way the team handled the household सामान.',
-      'The team took reasonable care of the belongings.',
-      'Overall handling of the items was good.',
-    ],
-  },
+const packingSentences = [
+  "Packing was done properly and the team handled the items carefully.",
+  "The packing team worked neatly and systematically.",
+  "The packing process was organised and handled with care.",
+  "The team took proper care while packing the household items.",
+  "Packing and loading were handled in a professional manner.",
+  "The workers were careful while handling the items during packing.",
+  "The packing work was done neatly and without unnecessary confusion.",
+  "The team managed the packing work quite efficiently.",
 ];
 
-type PhraseGroup = {
-  start: string[];
-  middle: string[];
-  ending: string[];
+const transportSentences = [
+  "Transportation was coordinated smoothly from pickup to delivery.",
+  "The movement from pickup to destination was handled well.",
+  "The transportation part of the move was properly coordinated.",
+  "The team kept the transportation process straightforward.",
+  "The vehicle and delivery coordination were handled well.",
+  "The shifting from one city to another was managed smoothly.",
+  "The delivery coordination was simple and convenient.",
+  "The overall transportation experience was satisfactory.",
+];
+
+const experienceMap: Record<string, string[]> = {
+  "Careful packing": [
+    "I especially liked the way the packing was handled.",
+    "The packing work was one of the better parts of the service.",
+    "I was satisfied with how the items were packed.",
+    "The packing was done in a neat and organised way.",
+  ],
+
+  "Professional team": [
+    "The team was professional and cooperative.",
+    "The staff behaved professionally throughout the work.",
+    "The workers were polite and professional.",
+    "The team maintained a professional approach during the move.",
+  ],
+
+  "On-time service": [
+    "The service was completed around the agreed schedule.",
+    "The team followed the planned timing reasonably well.",
+    "The work was coordinated according to the discussed schedule.",
+    "The timing and coordination were handled well.",
+  ],
+
+  "Good communication": [
+    "Communication was clear whenever I needed an update.",
+    "It was easy to communicate with the team.",
+    "The response from the team was good throughout the process.",
+    "I could easily coordinate with the staff whenever required.",
+  ],
+
+  "Smooth loading": [
+    "Loading was handled properly and without much hassle.",
+    "The loading work was organised and fairly smooth.",
+    "The team managed the loading work efficiently.",
+    "Loading was done in a systematic manner.",
+  ],
+
+  "Smooth delivery": [
+    "Delivery was coordinated smoothly at the destination.",
+    "The delivery process was convenient and straightforward.",
+    "The destination-side coordination was handled well.",
+    "The delivery was managed without unnecessary confusion.",
+  ],
+
+  "Helpful staff": [
+    "The staff was helpful whenever I had a question.",
+    "The team was cooperative whenever I needed assistance.",
+    "The staff was approachable and helpful.",
+    "Everyone I interacted with was reasonably helpful.",
+  ],
+
+  "Value for money": [
+    "Overall, I felt the service was worth the money.",
+    "For the service provided, I found it reasonably priced.",
+    "The overall service felt like good value for the money.",
+    "I found the service fairly reasonable for the work involved.",
+  ],
 };
 
-const FIVE_STAR_PATTERNS: PhraseGroup[] = [
-  {
-    start: [
-      'Had a really good experience with',
-      'Overall a very good experience with',
-      'Quite happy with the service from',
-      'Used',
-      'Recently used',
-      'Took their service for',
-      'My experience with',
-      'I had a smooth experience with',
-      'Really satisfied with',
-      'Pretty happy with',
-    ],
-    middle: [
-      'for my move from {FROM} to {TO}.',
-      'for shifting from {FROM} to {TO}.',
-      'for my shifting requirement from {FROM} to {TO}.',
-      'for a {SERVICE} move from {FROM} to {TO}.',
-      'when I needed {SERVICE} from {FROM} to {TO}.',
-    ],
-    ending: [
-      'Would definitely recommend them for a smooth move.',
-      'Overall, good service and cooperative team.',
-      'Good option if you are looking for packers and movers in Ayodhya.',
-      'Happy with the overall service.',
-      'Would consider using them again.',
-      'A reliable option for moving and transportation.',
-      'Good experience overall.',
-    ],
-  },
+const keywordTemplates = [
+  (city: string) => `If you are looking for packers and movers in ${city}, this is a good option.`,
+  (city: string) => `For anyone searching for the best packers in ${city, this is worth considering.`,
+  (city: string) => `I can recommend them if you need a moving service in ${city}.`,
+  (city: string) => `A good option for packers and movers in ${city}.`,
+  (city: string) => `For my requirement, they provided one of the better moving services in ${city}.`,
+  (city: string) => `People looking for a reliable moving service in ${city} can consider them.`,
+  (city: string) => `Overall, I would consider them among the better packers in ${city}.`,
+  (city: string) => `If you need moving services around ${city}, their service is worth checking out.`,
 ];
 
-const FOUR_STAR_PATTERNS: PhraseGroup[] = [
-  {
-    start: [
-      'Had a good experience with',
-      'Overall my experience with',
-      'I recently used',
-      'Used',
-      'My experience with',
-      'Quite satisfied with',
-      'The service from',
-    ],
-    middle: [
-      'for shifting from {FROM} to {TO}.',
-      'for my move from {FROM} to {TO}.',
-      'for {SERVICE} from {FROM} to {TO}.',
-      'when I needed shifting from {FROM} to {TO}.',
-    ],
-    ending: [
-      'Overall the service was good.',
-      'A decent experience overall.',
-      'The team was helpful and cooperative.',
-      'There is some room for improvement, but overall I was satisfied.',
-      'Would recommend them for their overall service.',
-      'Good service overall.',
-    ],
-  },
+const endings = [
+  "Overall, it was a convenient experience and I would consider using them again.",
+  "Overall satisfied with the service and would recommend them.",
+  "The whole process was fairly smooth and I would recommend them.",
+  "Happy with the overall service and coordination.",
+  "Overall, a positive experience and I would recommend the team.",
+  "The service made my shifting process easier than expected.",
+  "I would definitely consider them again for a future move.",
+  "Overall, a satisfactory experience from my side.",
+  "Quite happy with the way the move was handled.",
+  "Good experience overall and the team was cooperative.",
+  "The service was convenient and I was satisfied with the overall handling.",
+  "Overall, the service was professional and easy to coordinate.",
 ];
 
-const THREE_STAR_PATTERNS: PhraseGroup[] = [
-  {
-    start: [
-      'Used',
-      'I recently tried',
-      'My experience with',
-      'I took the service of',
-      'Overall experience with',
-    ],
-    middle: [
-      'for shifting from {FROM} to {TO}.',
-      'for my moving requirement from {FROM} to {TO}.',
-      'for {SERVICE} from {FROM} to {TO}.',
-    ],
-    ending: [
-      'Overall it was an okay experience.',
-      'The service was acceptable, although there is room for improvement.',
-      'Some parts of the service were good, while some could be better.',
-      'Overall a mixed but manageable experience.',
-    ],
-  },
+const hinglishLines = [
+  "Overall kaafi smooth experience raha.",
+  "Team ka response bhi achha tha.",
+  "Coordination mein zyada hassle nahi hua.",
+  "Kaam overall properly managed tha.",
+  "Shifting process kaafi straightforward raha.",
+  "Team ke saath coordinate karna easy tha.",
+  "Overall experience simple aur convenient raha.",
+  "Staff ka behaviour bhi achha tha.",
+  "Process mein unnecessary confusion nahi hua.",
+  "Kaafi decent service experience raha.",
+  "Team cooperative thi aur kaam smoothly hua.",
+  "Overall kaam expected way mein ho gaya.",
 ];
+
+const serviceKeywords: Record<string, string[]> = {
+  "House Shifting": [
+    "house shifting",
+    "home shifting",
+    "house moving",
+    "home relocation",
+  ],
+  "Office Shifting": [
+    "office shifting",
+    "office relocation",
+    "commercial shifting",
+    "office moving",
+  ],
+  "Packing & Moving": [
+    "packing and moving",
+    "packing and shifting",
+    "moving service",
+    "relocation service",
+  ],
+  "Bike Transportation": [
+    "bike transportation",
+    "bike shifting",
+    "two-wheeler transportation",
+    "bike relocation",
+  ],
+  "Car Transportation": [
+    "car transportation",
+    "car shifting",
+    "vehicle transportation",
+    "car relocation",
+  ],
+  "Loading & Unloading": [
+    "loading and unloading",
+    "loading service",
+    "unloading service",
+    "shifting assistance",
+  ],
+};
+
+let lastGeneratedReview = "";
 
 function randomItem<T>(items: T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-function shuffle<T>(items: T[]): T[] {
-  return [...items].sort(() => Math.random() - 0.5);
+function randomChance(percent: number): boolean {
+  return Math.random() * 100 < percent;
 }
 
-function replaceRoute(text: string, input: ReviewInput): string {
+function cleanText(text: string): string {
   return text
-    .replace(/\{FROM\}/g, input.fromCity)
-    .replace(/\{TO\}/g, input.toCity)
-    .replace(/\{SERVICE\}/g, input.service.toLowerCase());
-}
-
-function getPattern(rating: ReviewRating): PhraseGroup {
-  if (rating === 5) return randomItem(FIVE_STAR_PATTERNS);
-  if (rating === 4) return randomItem(FOUR_STAR_PATTERNS);
-  return randomItem(THREE_STAR_PATTERNS);
-}
-
-function getExperiencePhrases(input: ReviewInput): string[] {
-  const selected = input.experiences
-    .map((id) => EXPERIENCES.find((experience) => experience.id === id))
-    .filter(Boolean) as typeof EXPERIENCES;
-
-  return shuffle(
-    selected.flatMap((experience) => experience.phrases),
-  ).slice(0, Math.min(3, selected.length));
-}
-
-function keywordSentence(input: ReviewInput): string {
-  const options = [
-    `If you are searching for the best packers in ${input.fromCity}, they are worth considering.`,
-    `${input.fromCity} me packers and movers ke liye my experience was good.`,
-    `For anyone looking for a good moving service in ${input.fromCity}, they are a decent option.`,
-    `I was looking for a reliable service in ${input.fromCity} and overall the experience was good.`,
-    `For ${input.fromCity} to ${input.toCity} shifting, the overall service was satisfactory.`,
-    `I would consider them among the better moving options in ${input.fromCity}.`,
-    `Good option for people looking for packers and movers in ${input.fromCity}.`,
-    `Overall, the service was good for my ${input.fromCity} to ${input.toCity} move.`,
-  ];
-
-  return randomItem(options);
-}
-
-function hinglishSentence(input: ReviewInput): string {
-  const options = [
-    `Overall kaafi smooth experience raha.`,
-    `Team ka response bhi theek tha.`,
-    `Coordination mein koi major issue nahi hua.`,
-    `Kaam properly manage kiya gaya.`,
-    `Overall service se satisfied raha.`,
-    `Team cooperative thi aur kaam time par handle hua.`,
-    `Mera overall experience positive raha.`,
-    `Shifting process relatively hassle free raha.`,
-  ];
-
-  return randomItem(options);
-}
-
-export function generateReview(input: ReviewInput): string {
-  const pattern = getPattern(input.rating);
-
-  const start = replaceRoute(randomItem(pattern.start), input);
-  const middle = replaceRoute(randomItem(pattern.middle), input);
-  const experiences = getExperiencePhrases(input);
-
-  const parts: string[] = [
-    `${start} ${BUSINESS} ${middle}`,
-  ];
-
-  if (experiences.length > 0) {
-    parts.push(...experiences);
-  }
-
-  // Hinglish is intentionally occasional, not forced into every review.
-  if (Math.random() > 0.45) {
-    parts.push(hinglishSentence(input));
-  }
-
-  // SEO phrase is used naturally and not in every generated review.
-  if (Math.random() > 0.55) {
-    parts.push(keywordSentence(input));
-  }
-
-  parts.push(randomItem(pattern.ending));
-
-  return cleanReview(parts.join(' '));
-}
-
-function cleanReview(text: string): string {
-  return text
-    .replace(/\s+/g, ' ')
-    .replace(/\s+([,.!?])/g, '$1')
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,.!?])/g, "$1")
     .trim();
 }
 
-/**
- * Returns a fresh review every time.
- * The timestamp + random seed prevents accidental same-output repetition
- * when the user taps Generate repeatedly.
- */
-export function generateUniqueReview(input: ReviewInput): string {
-  const review = generateReview(input);
+function buildReview(options: ReviewOptions): string {
+  const {
+    rating,
+    fromCity,
+    toCity,
+    service,
+    experiences,
+  } = options;
 
-  // Small variation if the random generator happens to produce
-  // the same output consecutively.
-  return `${review} `;
+  const parts: string[] = [];
+
+  const intro = randomItem(introductions);
+  parts.push(`${intro} ${BUSINESS} for ${service.toLowerCase()}.`);
+
+  if (fromCity && toCity) {
+    parts.push(
+      `I needed to move from ${fromCity} to ${toCity}, and the overall coordination was handled well.`
+    );
+  } else if (fromCity) {
+    parts.push(
+      `I needed moving assistance in ${fromCity}, and the overall coordination was handled well.`
+    );
+  }
+
+  parts.push(randomItem(serviceSentences));
+
+  if (
+    service.toLowerCase().includes("pack") ||
+    randomChance(55)
+  ) {
+    parts.push(randomItem(packingSentences));
+  }
+
+  if (
+    fromCity !== toCity &&
+    (service.toLowerCase().includes("transport") ||
+      service.toLowerCase().includes("shift") ||
+      randomChance(60))
+  ) {
+    parts.push(randomItem(transportSentences));
+  }
+
+  if (experiences.length > 0) {
+    const usableExperiences = experiences
+      .flatMap((experience) => experienceMap[experience] || [])
+      .filter(Boolean);
+
+    if (usableExperiences.length > 0) {
+      const selected = [...usableExperiences]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, Math.min(2, usableExperiences.length));
+
+      selected.forEach((sentence) => parts.push(sentence));
+    }
+  }
+
+  if (randomChance(35)) {
+    parts.push(randomItem(hinglishLines));
+  }
+
+  if (randomChance(50)) {
+    const keywordCity = randomChance(50) ? fromCity : toCity;
+
+    if (keywordCity) {
+      parts.push(randomItem(keywordTemplates)(keywordCity));
+    }
+  }
+
+  if (randomChance(25)) {
+    const keywords = serviceKeywords[service];
+
+    if (keywords && keywords.length > 0) {
+      parts.push(
+        `The ${randomItem(keywords)} experience was overall satisfactory.`
+      );
+    }
+  }
+
+  if (rating <= 2) {
+    parts.push(
+      "There were a few areas where the service could have been better."
+    );
+  } else if (rating === 3) {
+    parts.push(
+      "Overall it was a decent experience, although there is still some room for improvement."
+    );
+  } else {
+    parts.push(randomItem(endings));
+  }
+
+  return cleanText(parts.join(" "));
 }
 
-export function getCityOptions(): string[] {
-  return MAJOR_CITIES;
-}
+export function generateReview(options: ReviewOptions): string {
+  let review = "";
+  let attempts = 0;
 
-export function getServiceOptions(): string[] {
-  return SERVICES;
+  do {
+    review = buildReview(options);
+    attempts++;
+  } while (
+    review === lastGeneratedReview &&
+    attempts < 20
+  );
+
+  lastGeneratedReview = review;
+
+  return review;
 }
